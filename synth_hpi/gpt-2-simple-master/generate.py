@@ -14,10 +14,11 @@ default_checkpoint_dir = 'checkpoint'
 default_run_name = '{}-{}-epoch{}'.format(data_name, model_name, train_step)
 default_destination_path = 'output/output_{}_{}_{}.txt'.format(data_name, model_name, train_step) #i2b2-n2c2-7744M-1000.txt'
 default_nsamples = 1000
+default_batch_size = 1
 
 def parse_cmd(argv):
     try:
-        opts, args = getopt.getopt(argv, 'h',['gpu=', 'checkpoint_dir=', 'run_name=', 'destination_path=', 'nsamples='])
+        opts, args = getopt.getopt(argv, 'h',['gpu=', 'checkpoint_dir=', 'run_name=', 'destination_path=', 'nsamples=', 'batch_size='])
         opt_arg = dict(opts)
         if ('-h' in opt_arg.keys()):
             print('usage: python {} --gpu --model_name --data_file --train_step --checkpoint_dir --run_name --destination_path --nsamples'.format(__file__))
@@ -33,6 +34,8 @@ def parse_cmd(argv):
             opt_arg['--destination_path'] = default_destination_path
         if '--nsamples' not in opt_arg:
             opt_arg['--nsamples'] = default_nsamples
+        if '--batch_size' not in opt_arg:
+            opt_arg['--batch_size'] = default_batch_size
     except getopt.GetoptError:
         print('invalid arguments!')
         print('`python main.py -h`  for help')
@@ -46,6 +49,7 @@ if __name__ == "__main__":
     run_name = opt_arg['--run_name']
     destination_path = opt_arg['--destination_path']
     nsamples = int(opt_arg['--nsamples'])
+    batch_size = int(opt_arg['--batch_size'])
     
     os.environ['CUDA_VISIBLE_DEVICES'] = gpu
     #print(checkpoint_dir + ":" + run_name + ":" + destination_path + ":" + str(nsamples))
@@ -55,5 +59,5 @@ if __name__ == "__main__":
     print(checkpoint_dir + "/" + run_name)
     gpt2.load_gpt2(sess, checkpoint_dir=checkpoint_dir, run_name=run_name)
     # generate some text
-    gpt2.generate_to_file(sess, checkpoint_dir=checkpoint_dir, run_name=run_name, destination_path=destination_path, nsamples=nsamples)
+    gpt2.generate_to_file(sess, checkpoint_dir=checkpoint_dir, run_name=run_name, destination_path=destination_path, nsamples=nsamples, batch_size=batch_size)
     print('generate_gpt_2_simple done.')
